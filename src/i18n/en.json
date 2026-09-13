@@ -1,0 +1,159 @@
+{
+  "common": {
+    "appName": "TAGMI",
+    "tagline": "Morocco Real Estate",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "noResults": "No results found",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "buy": "Buy",
+    "rent": "Rent",
+    "sell": "Sell",
+    "invest": "Invest",
+    "properties": "Properties",
+    "agents": "Agents",
+    "agencies": "Agencies",
+    "developers": "Developers",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "favorites": "My favorites",
+    "changeLanguage": "Language"
+  },
+  "home": {
+    "hero": {
+      "title": "Find your next property",
+      "subtitle": "Thousands of properties for sale and rent across Morocco",
+      "cta": "Search"
+    },
+    "search": {
+      "placeholder": "Search by city, neighborhood, property type...",
+      "city": "City",
+      "type": "Property type",
+      "transaction": "Transaction",
+      "budget": "Budget"
+    },
+    "sections": {
+      "featured": "Featured Properties",
+      "popularCities": "Popular Cities",
+      "newListings": "New Listings",
+      "premium": "Premium Properties",
+      "agents": "Verified Agents",
+      "agencies": "Verified Agencies",
+      "howItWorks": "How TAGMI Works",
+      "cta": "Ready to find your property?"
+    }
+  },
+  "property": {
+    "details": "Property Details",
+    "features": "Features",
+    "description": "Description",
+    "location": "Location",
+    "agent": "Agent",
+    "contact": "Contact",
+    "scheduleVisit": "Schedule a Visit",
+    "save": "Save",
+    "share": "Share",
+    "similar": "Similar Properties",
+    "stats": {
+      "views": "views",
+      "favorites": "favorites",
+      "inquiries": "inquiries"
+    },
+    "badges": {
+      "verified": "Verified",
+      "new": "New",
+      "featured": "Featured"
+    },
+    "transactions": {
+      "sale": "For Sale",
+      "rent": "For Rent",
+      "shortTermRent": "Short-term",
+      "investment": "Investment"
+    },
+    "month": "/month",
+    "noImage": "No image",
+    "viewDetails": "View details",
+    "compare": "Add to comparison"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "registerAs": "Register as",
+    "roles": {
+      "BUYER": "Buyer",
+      "RENTER": "Renter",
+      "PROPERTY_OWNER": "Property Owner",
+      "AGENT": "Real Estate Agent"
+    }
+  },
+  "dashboard": {
+    "overview": "Overview",
+    "properties": "My Properties",
+    "leads": "Leads",
+    "clients": "Clients",
+    "visits": "Visits",
+    "offers": "Offers",
+    "messages": "Messages",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "users": "Users",
+    "properties": "Properties",
+    "agents": "Agents",
+    "agencies": "Agencies",
+    "leads": "Leads",
+    "reports": "Reports",
+    "reviews": "Reviews",
+    "blog": "Blog",
+    "settings": "Settings",
+    "auditLogs": "Audit Logs"
+  },
+  "seo": {
+    "home": {
+      "title": "TAGMI - Morocco Real Estate | Buy, Rent, Sell",
+      "description": "Find your next property in Morocco. Thousands of verified listings in Marrakech, Casablanca, Rabat and across Morocco."
+    },
+    "buy": {
+      "title": "Buy Property in Morocco | TAGMI",
+      "description": "Discover the best real estate deals in Morocco. Apartments, villas, riads and land for sale."
+    },
+    "rent": {
+      "title": "Rent Property in Morocco | TAGMI",
+      "description": "Find your next rental property in Morocco. Long-term and short-term verified rentals."
+    }
+  }
+}

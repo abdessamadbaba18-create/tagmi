@@ -1,0 +1,886 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  AGENCY_OWNER
+  AGENT
+  PROPERTY_OWNER
+  DEVELOPER
+  INVESTOR
+  BUYER
+  RENTER
+  USER
+}
+
+enum TransactionType {
+  SALE
+  RENT
+  SHORT_TERM_RENT
+  INVESTMENT
+}
+
+enum PropertyType {
+  APARTMENT
+  VILLA
+  HOUSE
+  RIAD
+  LAND
+  OFFICE
+  SHOP
+  COMMERCIAL
+  HOTEL
+  FARM
+  NEW_DEVELOPMENT
+  OTHER
+}
+
+enum PropertyStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  SOLD
+  RENTED
+  ARCHIVED
+  REJECTED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  VISIT_SCHEDULED
+  NEGOTIATING
+  WON
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE
+  WHATSAPP
+  PHONE
+  GOOGLE
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  ORGANIC_SEO
+  REFERRAL
+  DIRECT
+}
+
+enum VisitStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum NotificationType {
+  LEAD
+  VISIT
+  OFFER
+  MESSAGE
+  PROPERTY_APPROVED
+  PROPERTY_REJECTED
+  NEW_MATCH
+  SYSTEM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum Currency {
+  MAD
+  USD
+  EUR
+}
+
+enum ReportReason {
+  FRAUD
+  DUPLICATE
+  INAPPROPRIATE
+  WRONG_INFO
+  SCAM
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  PUBLISH
+  REJECT
+  APPROVE
+  REPORT
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  BANK_TRANSFER
+  PAYPAL
+  OTHER
+}
+
+// ─── MODELS ──────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  phoneVerified Boolean   @default(false)
+  emailVerified Boolean   @default(false)
+  avatar        String?
+  role          Role      @default(USER)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  agency                Agency?
+  agent                 Agent?
+  properties            Property[]
+  favorites             Favorite[]
+  savedSearches         SavedSearch[]
+  leads                 Lead[]                @relation("LeadOwner")
+  messagesSent          Message[]             @relation("MessageSender")
+  messagesReceived      Message[]             @relation("MessageReceiver")
+  notifications         Notification[]
+  reports               Report[]
+  reviews               Review[]
+  subscriptions         Subscription[]
+  auditLogs             AuditLog[]
+  propertyViews         PropertyView[]
+  blogPosts             BlogPost[]
+  orders                Order[]
+
+  @@index([role])
+  @@index([email])
+  @@index([isActive])
+}
+
+model Agency {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  logo          String?
+  coverImage    String?
+  email         String?
+  phone         String?
+  whatsapp      String?
+  website       String?
+  address       String?
+  city          String?
+  verified      Boolean   @default(false)
+  verifiedAt    DateTime?
+  licenseNumber String?
+  isActive      Boolean   @default(true)
+  rating        Float?    @default(0)
+  reviewCount   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  ownerId     String    @unique
+  owner       User      @relation(fields: [ownerId], references: [id])
+  agents      Agent[]
+  properties  Property[]
+  leads       Lead[]
+  reviews     Review[]
+
+  @@index([slug])
+  @@index([verified])
+  @@index([ownerId])
+}
+
+model Agent {
+  id              String    @id @default(cuid())
+  bio             String?
+  licenseNumber   String?
+  specialization  String?
+  verified        Boolean   @default(false)
+  verifiedAt      DateTime?
+  yearsExperience Int?
+  rating          Float?    @default(0)
+  reviewCount     Int       @default(0)
+  listingCount    Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  agencyId    String?
+  agency      Agency?   @relation(fields: [agencyId], references: [id])
+  properties  Property[]
+  leads       Lead[]
+  reviews     Review[]
+  visits      Visit[]
+
+  @@index([userId])
+  @@index([agencyId])
+  @@index([verified])
+}
+
+model Property {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  description     String
+  transactionType TransactionType
+  propertyType    PropertyType
+  status          PropertyStatus  @default(DRAFT)
+  price           Decimal         @db.Decimal(14, 2)
+  currency        Currency        @default(MAD)
+  pricePerSqm     Decimal?        @db.Decimal(10, 2)
+
+  // Physical attributes
+  surfaceArea     Decimal?        @db.Decimal(10, 2)
+  landArea        Decimal?        @db.Decimal(10, 2)
+  bedrooms        Int?
+  bathrooms       Int?
+  rooms           Int?
+  floor           Int?
+  totalFloors     Int?
+  yearBuilt       Int?
+
+  // Boolean features
+  furnished       Boolean         @default(false)
+  parking         Boolean         @default(false)
+  garden          Boolean         @default(false)
+  pool            Boolean         @default(false)
+  terrace         Boolean         @default(false)
+  balcony         Boolean         @default(false)
+  elevator        Boolean         @default(false)
+  airConditioning Boolean         @default(false)
+  heating         Boolean         @default(false)
+  security        Boolean         @default(false)
+
+  // Location
+  latitude        Decimal?        @db.Decimal(10, 7)
+  longitude       Decimal?        @db.Decimal(10, 7)
+  address         String?
+
+  // Verification
+  verified        Boolean         @default(false)
+  verifiedAt      DateTime?
+
+  // Stats
+  viewCount       Int             @default(0)
+  favoriteCount   Int             @default(0)
+  inquiryCount    Int             @default(0)
+
+  // Reference
+  reference       String?         @unique
+
+  // Timestamps
+  publishedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  cityId          String
+  city            City            @relation(fields: [cityId], references: [id])
+  neighborhoodId  String?
+  neighborhood    Neighborhood?   @relation(fields: [neighborhoodId], references: [id])
+  agentId         String?
+  agent           Agent?          @relation(fields: [agentId], references: [id])
+  agencyId        String?
+  agency          Agency?         @relation(fields: [agencyId], references: [id])
+  ownerId         String
+  owner           User            @relation(fields: [ownerId], references: [id])
+
+  images          PropertyImage[]
+  videos          PropertyVideo[]
+  features        PropertyFeature[]
+  favorites       Favorite[]
+  leads           Lead[]
+  visits          Visit[]
+  offers          Offer[]
+  views           PropertyView[]
+  reports         Report[]
+  featuredListings FeaturedListing[]
+  orders          Order[]
+
+  @@index([status])
+  @@index([transactionType])
+  @@index([propertyType])
+  @@index([price])
+  @@index([cityId])
+  @@index([neighborhoodId])
+  @@index([agentId])
+  @@index([agencyId])
+  @@index([ownerId])
+  @@index([createdAt])
+  @@index([slug])
+  @@index([verified])
+  @@index([status, cityId, propertyType])
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  url        String
+  alt        String?
+  sortOrder  Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([propertyId, isPrimary])
+}
+
+model PropertyVideo {
+  id         String   @id @default(cuid())
+  url        String
+  title      String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+model PropertyFeature {
+  id         String   @id @default(cuid())
+  name       String
+  value      String?
+  category   String?
+  createdAt  DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([propertyId, category])
+}
+
+model City {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  nameAr      String?
+  nameFr      String?
+  image       String?
+  description String?
+  latitude    Decimal? @db.Decimal(10, 7)
+  longitude   Decimal? @db.Decimal(10, 7)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  neighborhoods  Neighborhood[]
+  properties     Property[]
+  developmentProjects DevelopmentProject[]
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+model Neighborhood {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  nameAr      String?
+  nameFr      String?
+  image       String?
+  description String?
+  latitude    Decimal? @db.Decimal(10, 7)
+  longitude   Decimal? @db.Decimal(10, 7)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cityId      String
+  city        City     @relation(fields: [cityId], references: [id])
+  properties  Property[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+  @@index([slug])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+}
+
+model SavedSearch {
+  id              String          @id @default(cuid())
+  name            String?
+  query           Json            // Stores search filters as JSON
+  cityId          String?
+  propertyType    PropertyType?
+  transactionType TransactionType?
+  minPrice        Decimal?        @db.Decimal(14, 2)
+  maxPrice        Decimal?        @db.Decimal(14, 2)
+  bedrooms        Int?
+  notifyNewMatch  Boolean         @default(false)
+  lastNotifiedAt  DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([notifyNewMatch])
+}
+
+model PropertyView {
+  id         String   @id @default(cuid())
+  ipAddress  String?
+  userAgent  String?
+  referer    String?
+  viewedAt   DateTime @default(now())
+
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([viewedAt])
+  @@index([propertyId, viewedAt])
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  message     String?
+  budget      Decimal?   @db.Decimal(14, 2)
+  status      LeadStatus @default(NEW)
+  source      LeadSource @default(WEBSITE)
+  score       Int        @default(0)
+  notes       String?
+  lastContact DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  ownerId     String
+  owner       User       @relation("LeadOwner", fields: [ownerId], references: [id])
+  propertyId  String?
+  property    Property?  @relation(fields: [propertyId], references: [id])
+  agentId     String?
+  agent       Agent?     @relation(fields: [agentId], references: [id])
+  agencyId    String?
+  agency      Agency?    @relation(fields: [agencyId], references: [id])
+
+  interactions LeadInteraction[]
+  visits       Visit[]
+  offers       Offer[]
+
+  @@index([ownerId])
+  @@index([propertyId])
+  @@index([agentId])
+  @@index([agencyId])
+  @@index([status])
+  @@index([source])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model LeadInteraction {
+  id         String   @id @default(cuid())
+  type       String   // email, phone, whatsapp, meeting
+  content    String?
+  direction  String   // inbound, outbound
+  createdAt  DateTime @default(now())
+
+  leadId     String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([createdAt])
+}
+
+model Visit {
+  id          String     @id @default(cuid())
+  scheduledAt DateTime
+  notes       String?
+  status      VisitStatus @default(PENDING)
+  outcome     String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  leadId      String
+  lead        Lead       @relation(fields: [leadId], references: [id])
+  propertyId  String
+  property    Property   @relation(fields: [propertyId], references: [id])
+  agentId     String?
+  agent       Agent?     @relation(fields: [agentId], references: [id])
+
+  @@index([leadId])
+  @@index([propertyId])
+  @@index([agentId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model Offer {
+  id          String     @id @default(cuid())
+  amount      Decimal    @db.Decimal(14, 2)
+  currency    Currency   @default(MAD)
+  message     String?
+  status      OfferStatus @default(PENDING)
+  expiresAt   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  leadId      String
+  lead        Lead       @relation(fields: [leadId], references: [id])
+  propertyId  String
+  property    Property   @relation(fields: [propertyId], references: [id])
+
+  @@index([leadId])
+  @@index([propertyId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  senderId   String
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType @default(SYSTEM)
+  read      Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  plan        String             // FREE, AGENT_PRO, AGENCY
+  status      SubscriptionStatus @default(ACTIVE)
+  startDate   DateTime           @default(now())
+  endDate     DateTime?
+  price       Decimal?           @db.Decimal(10, 2)
+  currency    Currency           @default(MAD)
+  features    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([plan])
+}
+
+model FeaturedListing {
+  id         String   @id @default(cuid())
+  type       String   // homepage, city, search
+  startDate  DateTime @default(now())
+  endDate    DateTime
+  priority   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([type, startDate, endDate])
+}
+
+model Order {
+  id             String         @id @default(cuid())
+  orderNumber    String         @unique
+  status         OrderStatus    @default(PENDING)
+  paymentMethod  PaymentMethod  @default(CARD)
+  amount         Decimal        @db.Decimal(14, 2)
+  currency       Currency       @default(MAD)
+  depositAmount  Decimal?       @db.Decimal(14, 2)
+  reservationType String?       // buy, deposit, reserve
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  notes          String?
+  paidAt         DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  userId         String?
+  user           User?          @relation(fields: [userId], references: [id])
+  propertyId     String
+  property       Property       @relation(fields: [propertyId], references: [id])
+
+  @@index([status])
+  @@index([userId])
+  @@index([propertyId])
+  @@index([createdAt])
+  @@index([orderNumber])
+}
+
+model Developer {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logo        String?
+  website     String?
+  verified    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projects    DevelopmentProject[]
+
+  @@index([slug])
+  @@index([verified])
+}
+
+model DevelopmentProject {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  status      String?  // PLANNING, UNDER_CONSTRUCTION, COMPLETED
+  image       String?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  developerId String
+  developer   Developer @relation(fields: [developerId], references: [id])
+  units       DevelopmentUnit[]
+  cityId      String?
+  city        City?     @relation(fields: [cityId], references: [id])
+
+  @@index([developerId])
+  @@index([slug])
+  @@index([cityId])
+}
+
+model DevelopmentUnit {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Decimal? @db.Decimal(14, 2)
+  surfaceArea Decimal? @db.Decimal(10, 2)
+  bedrooms    Int?
+  bathrooms   Int?
+  status      String?  // AVAILABLE, RESERVED, SOLD
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projectId   String
+  project     DevelopmentProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  tags        BlogTag[]
+
+  @@index([slug])
+  @@index([published])
+  @@index([categoryId])
+  @@index([authorId])
+}
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts       BlogPost[]
+
+  @@index([slug])
+}
+
+model BlogTag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  posts     BlogPost[]
+
+  @@index([slug])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  rating     Int
+  comment    String?
+  approved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  agentId    String?
+  agent      Agent?   @relation(fields: [agentId], references: [id])
+  agencyId   String?
+  agency     Agency?  @relation(fields: [agencyId], references: [id])
+
+  @@index([userId])
+  @@index([agentId])
+  @@index([agencyId])
+  @@index([approved])
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  reason     ReportReason
+  details    String?
+  status     ReportStatus @default(PENDING)
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt  DateTime     @default(now())
+
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  propertyId String?
+  property   Property?    @relation(fields: [propertyId], references: [id])
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([status])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      String   @default("string") // string, number, boolean, json
+  group     String?  @default("general")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@index([group])
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  action    AuditAction
+  entity    String
+  entityId  String?
+  oldData   Json?
+  newData   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
+}

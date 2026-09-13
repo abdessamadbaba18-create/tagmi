@@ -1,0 +1,159 @@
+{
+  "common": {
+    "appName": "TAGMI",
+    "tagline": "Immobilier Maroc",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "noResults": "Aucun résultat trouvé",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "close": "Fermer"
+  },
+  "nav": {
+    "home": "Accueil",
+    "buy": "Acheter",
+    "rent": "Louer",
+    "sell": "Vendre",
+    "invest": "Investir",
+    "properties": "Propriétés",
+    "agents": "Agents",
+    "agencies": "Agences",
+    "developers": "Développeurs",
+    "blog": "Blog",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "logout": "Déconnexion",
+    "favorites": "Mes favoris",
+    "changeLanguage": "Langue"
+  },
+  "home": {
+    "hero": {
+      "title": "Trouvez votre prochain bien immobilier",
+      "subtitle": "L'agence immobilière de référence au Maroc : des propriétés sélectionnées et vérifiées pour l'achat",
+      "cta": "Rechercher"
+    },
+    "search": {
+      "placeholder": "Rechercher par ville, quartier, type de bien...",
+      "city": "Ville",
+      "type": "Type de bien",
+      "transaction": "Transaction",
+      "budget": "Budget"
+    },
+    "sections": {
+      "featured": "Propriétés en vedette",
+      "popularCities": "Villes populaires",
+      "newListings": "Nouvelles annonces",
+      "premium": "Propriétés premium",
+      "agents": "Agents vérifiés",
+      "agencies": "Agences vérifiées",
+      "howItWorks": "Comment ça marche",
+      "cta": "Prêt à trouver votre bien ?"
+    }
+  },
+  "property": {
+    "details": "Détails du bien",
+    "features": "Caractéristiques",
+    "description": "Description",
+    "location": "Emplacement",
+    "agent": "Agent",
+    "contact": "Contacter",
+    "scheduleVisit": "Planifier une visite",
+    "save": "Sauvegarder",
+    "share": "Partager",
+    "similar": "Propriétés similaires",
+    "stats": {
+      "views": "vues",
+      "favorites": "favoris",
+      "inquiries": "demandes"
+    },
+    "badges": {
+      "verified": "Vérifié",
+      "new": "Nouveau",
+      "featured": "En vedette"
+    },
+    "transactions": {
+      "sale": "Vente",
+      "rent": "Location",
+      "shortTermRent": "Court terme",
+      "investment": "Investissement"
+    },
+    "month": "/mois",
+    "noImage": "Pas d'image",
+    "viewDetails": "Voir détails",
+    "compare": "Ajouter à la comparaison"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "registerAs": "S'inscrire en tant que",
+    "roles": {
+      "BUYER": "Acheteur",
+      "RENTER": "Locataire",
+      "PROPERTY_OWNER": "Propriétaire",
+      "AGENT": "Agent immobilier"
+    }
+  },
+  "dashboard": {
+    "overview": "Vue d'ensemble",
+    "properties": "Mes biens",
+    "leads": "Prospects",
+    "clients": "Clients",
+    "visits": "Visites",
+    "offers": "Offres",
+    "messages": "Messages",
+    "analytics": "Statistiques",
+    "settings": "Paramètres"
+  },
+  "admin": {
+    "dashboard": "Tableau de bord admin",
+    "users": "Utilisateurs",
+    "properties": "Propriétés",
+    "agents": "Agents",
+    "agencies": "Agences",
+    "leads": "Prospects",
+    "reports": "Signalements",
+    "reviews": "Avis",
+    "blog": "Blog",
+    "settings": "Paramètres",
+    "auditLogs": "Journal d'audit"
+  },
+  "seo": {
+    "home": {
+      "title": "TAGMI - Immobilier Maroc | Acheter, Louer, Vendre",
+      "description": "Trouvez votre prochain bien immobilier au Maroc. Des milliers d'annonces vérifiées à Marrakech, Casablanca, Rabat et dans tout le Maroc."
+    },
+    "buy": {
+      "title": "Acheter un bien immobilier au Maroc | TAGMI",
+      "description": "Découvrez les meilleures offres immobilières au Maroc. Appartements, villas, riads et terrains à vendre."
+    },
+    "rent": {
+      "title": "Louer un bien immobilier au Maroc | TAGMI",
+      "description": "Trouvez votre prochain bien à louer au Maroc. Locations longue durée et saisonnières vérifiées."
+    }
+  }
+}
