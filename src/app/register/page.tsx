@@ -80,7 +80,7 @@ export default function RegisterPage() {
   };
 
   const roles: { value: RegisterRole; label: string }[] = [
-    { value: "BUYER", label: t("auth.roles.BUYER") }4
+    { value: "BUYER", label: t("auth.roles.BUYER") }
   ];
 
   const inputClass =

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
-import { Role } from "@prisma/client";
+import { OrderStatus, Role } from "@prisma/client";
 
-const REVENUE_STATUSES = ["PAID", "PROCESSING", "CONFIRMED", "COMPLETED"];
+const REVENUE_STATUSES: OrderStatus[] = ["PAID", "PROCESSING", "CONFIRMED", "COMPLETED"];
 
 function lastNMonths(n: number) {
   const months: { key: string; label: string; start: Date; end: Date }[] = [];
@@ -55,7 +55,7 @@ export async function GET() {
       }),
       ...months.map(async (m) => {
         const agg = await db.order.aggregate({
-          _count: { id: true },
+          _count: { _all: true },
           _sum: { amount: true },
           where: {
             createdAt: { gte: m.start, lt: m.end },
@@ -65,7 +65,7 @@ export async function GET() {
         return {
           key: m.key,
           label: m.label,
-          count: agg._count.id,
+          count: agg._count._all,
           revenue: Number(agg._sum?.amount ?? 0),
         };
       }),
